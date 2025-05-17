@@ -1,0 +1,31 @@
+version: '3.8'
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.gateway
+    ports:
+      - '3000:3000'
+    depends_on:
+      - auth
+      - event
+    networks:
+      - app-network
+
+  auth:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.auth
+    networks:
+      - app-network
+
+  event:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.event
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
