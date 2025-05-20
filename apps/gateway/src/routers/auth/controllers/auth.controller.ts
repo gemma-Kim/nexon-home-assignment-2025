@@ -28,7 +28,8 @@ export class AuthController {
     return new SignUpResponseDto(await this.authService.signUp(payload));
   }
 
-  @UseGuards(AdminGuard)
+  // 임시 가드 해제
+  // @UseGuards(AdminGuard)
   @Post('signUp/internal')
   @ApiOperation({
     summary: '관리자 사용자 등록',
