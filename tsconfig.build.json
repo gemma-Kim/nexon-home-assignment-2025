@@ -1,4 +1,10 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"],
+  "baseUrl": ".",
+  "paths": {
+    "@gateway/*": ["apps/gateway/src/*"],
+    "@auth/*": ["apps/auth/src/*"],
+    "@event/*": ["apps/event/src/*"]
+  }
 }

@@ -1,73 +1,241 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# 🎁 Reward System - Event-Driven Microservices
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+이 프로젝트는 유저의 이벤트 참여에 따라 보상을 지급하고, 지급 상태를 추적/관리하는 **이벤트 기반 NestJS 마이크로서비스 시스템**입니다.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+# 🐳 실행 방법
 
-## Description
+## 준비 사항
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Node.js ≥ 18
+- Docker & Docker Compose 설치
 
-## Installation
+## 실행
 
 ```bash
-$ npm install
+docker-compose up --build -d
 ```
 
-## Running the app
+실행 후, 간단한 API 리스트를 확인할 수 있습니다:
 
-```bash
-# development
-$ npm run start
+📘 Swagger: http://localhost:3000/api-docs
 
-# watch mode
-$ npm run start:dev
+# 아키텍처 설계 방식
 
-# production mode
-$ npm run start:prod
+## 📁 기본 디렉토리 구조
+
+- NestJS의 모노레포 구조를 기반으로 구성되어 있으며, 각 앱은 독립된 도메인 로직을 가지고 있습니다.
+- 또한 루트의 package.json을 공유하여 공통 라이브러리, 설정, 스크립트를 함께 관리합니다.
+
+```csharp
+apps
+├── gateway                  # 모든 요청의 입구, 인가 책임
+├── auth                     # 인증 서비스 (토큰 발급, 유저/권한 관리)
+├── event                    # 이벤트 및 보상 관리 도메인
+├── mock-reward              # 테스트용 보상 서비스
+└── mock-reward-condition    # 테스트용 보상 조건 서비스
 ```
 
-## Test
+### 🧩 디렉토리 설계 의도
 
-```bash
-# unit tests
-$ npm run test
+#### apps/gateway
 
-# e2e tests
-$ npm run test:e2e
+- 모든 API 요청의 진입점 역할
+- 디렉토리 구성:
+  - authorization: 인가 처리 (JWT 토큰 유무, RoleGuard 등)
+  - routers: 각 마이크로서비스로 요청을 전달하는 라우팅 처리
+  - common: 공통 유틸 및 미들웨어
 
-# test coverage
-$ npm run test:cov
-```
+#### 도메인 마이크로서비스 (apps/auth, apps/event 등)
 
-## Support
+- DDD(도메인 주도 설계) 기반으로 각 마이크로서비스는 아래와 같이 구성됩니다.
+  - application: 유스케이스 및 서비스 계층
+  - domain: 엔티티, 밸류 오브젝트, 도메인 서비스 등 핵심 로직
+  - infrastructure: DB, 메시지 브로커 등 외부 연동 로직
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+# 아키텍처 설계 상세 설명
 
-## Stay in touch
+## 서버
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### 1️. Gateway (`apps/gateway`)
 
-## License
+- 모든 요청의 **입구 역할**
+- **Access Token 존재 여부 검사**를 통한 인가 처리 책임
+- `RoleGuard`를 통한 **API 접근 제어**
+- 이후 각각의 **마이크로서비스로 요청 전달**
 
-Nest is [MIT licensed](LICENSE).
+### 2️. Auth (`apps/auth`)
+
+- **`authentication` 모듈**
+
+  - Access Token 및 Refresh Token 발급 (**인증 기능**)
+
+- **`user` 모듈**
+
+  - 사용자 정보 **CRUD 및 조회**
+
+- **`role` 모듈**
+  - 사용자의 **역할(권한) 관리**
+
+### 3️. Event (`apps/event`)
+
+- **`event` 모듈**
+
+  - 이벤트 **등록, 조회, 삭제 등** 기능
+
+- **`reward` 모듈**
+  - 이벤트에 대한 **보상 정의 및 변경**
+
+### 4️. Mock Reward (`apps/mock-reward`)
+
+- 실제 보상 발급 로직을 대체하는 **테스트용 모듈**
+- `rewardType`, `value` 기반으로 **가상의 보상 처리**
+
+### 5️. Mock Reward Condition (`apps/mock-reward-condition`)
+
+- 보상 조건을 만족하는지 판단하는 **테스트용 모듈**
+- 사용자 정보 및 이벤트 조건을 기반으로 **조건 일치 여부 판별**
+
+---
+
+## 📦 주요 도메인 설명
+
+### 1. RewardClaimHistory
+
+유저의 보상 요청 이력을 관리하며, 중복 요청을 방지하는 역할을 합니다.
+
+- 보상 요청 시 반드시 하나의 이력이 생성됩니다.
+- 상태는 `REQUESTED`, `SUCCESS`, `FAILED` 중 하나로 기록됩니다.
+- userId + eventId 조합으로 **중복 요청 방지** (`unique index` 적용).
+- 실패 이력만 있는 경우, 동일 이벤트에 대해 재요청이 허용됩니다.
+
+### 2. RewardGrantState
+
+실제 보상이 지급되었는지를 추적하는 **보상 지급 상태 엔터티**입니다.
+
+- `requestedRewards`: 이벤트 기준 정의된 보상 목록
+- `grantedRewards`: 실제 지급된 보상 목록
+- `isFullyGranted`: 지급 완료 여부 플래그
+- `userId + eventId + status='REQUESTED'` 복합키를 통해 중복 보상 및 요청 제어
+
+보상이 하나씩 분할되어 지급되는 경우를 고려해
+`grantedRewards` 배열은 병합 + 중복 제거(Map 기반)되어 저장됩니다.
+
+### 3. MockRewardService
+
+실제 보상 처리 대신 **이벤트 기반 mock 지급 로직**을 담당합니다.
+
+- `reward.claim.requested` 이벤트 수신
+- 보상 타입(예: POINT, COUPON 등)에 관계없이 항상 mock 처리
+- 처리 완료 후 즉시 `reward.claim.granted` 이벤트 발행
+- 테스트 및 비즈니스 로직 분리 목적
+
+### 4. 비동기 이벤트 흐름 기반 동작
+
+이벤트 기반 마이크로서비스 구조로 아래와 같은 흐름으로 동작합니다:
+
+1. `POST /claim` 요청 시 내부 조건 평가 및 이력 생성
+2. 내부 이벤트 `reward.claim.requested` (보상 지급 요청) 발행
+3. `MockRewardService`가 수신 후, 즉시 `reward.claim.granted` (보상 지금 완료) 발행
+4. event 서버의 `RewardGrantedController`가 수신하여 보상 상태를 업데이트 (`isFullyGranted` 판단)
+
+---
+
+## 실시간 보상 처리 설계 및 중복 방지 전략
+
+### 🎯 실시간 보상 설계 이유
+
+- 보상 지급을 **관리자 수동 승인 방식**으로 처리하기보다, **유저의 요청 즉시 보상**이 이루어지도록 설계
+- 사용자 경험(UX)을 높이기 위해, **실시간성과 자동성**을 최대한 보장하는 구조를 목표로 함
+
+### ⚙️ 보상 처리 흐름
+
+1. **이벤트 생성 시점**
+
+   - 조건 (Condition)과 보상 (Reward) 포함하여 이벤트를 정의
+   - 조건은 외부 도메인 서버에서 확인 가능한 구조로 저장됨
+
+2. **사용자 보상 요청 시점**
+   - 이벤트가 현재 시점에 **활성화되어 있는지 확인**
+   - 사용자 요청이 **사전에 정의된 조건을 만족하는지** 외부 도메인 서버에 요청해 검증
+   - 조건을 만족할 경우, **보상 도메인 서버에 비동기적으로 보상 지급 요청을 퍼블리싱**
+   - 보상 도메인은 퍼블리싱 받은 요청을 처리한 뒤, 히스토리 및 상태를 업데이트
+
+> 조건 검증 단계에서 이미 일정한 지연시간(Latency)이 발생하므로, **보상 자체는 비동기 처리**를 통해 전체 응답 속도를 개선
+
+### 🛡 중복 보상 방지 전략
+
+#### 1차 방어: 애플리케이션 단 로직
+
+- 보상 요청 시, 해당 `(userId, eventId)` 조합에 대해
+  - `requested` 상태가 이미 존재하거나
+  - `success` 상태가 기록되어 있다면
+  - 즉시 보상 로직을 차단
+
+#### 2차 방어: DB 단 복합 유니크 제약조건
+
+- 보상 상태를 관리하는 테이블 (예: `userId` + `eventId` + `status=''REQUESTED`)에 아래 복합 유니크 인덱스 설정:
+- 해당 키로 인해 **중복 보상 요청은 DB 저장 시점에서 에러 발생**
+- 에러 발생 시, 이미 처리된 것으로 간주하고 **히스토리만 저장**
+
+> 이를 통해 **데이터 정합성(Consistency)**과 **무결성(Integrity)**을 이중으로 보장할 수 있음
+
+### ✅ 요약
+
+- 실시간 자동 보상 구조
+- 조건 만족 여부 검증 후 비동기 보상 요청
+- 애플리케이션 + 데이터베이스 두 단계로 중복 방지
+- 높은 신뢰성과 UX를 동시에 달성
+
+## 📌 Write / Read Concern 설정 이유
+
+### 🛡️ Auth 서버
+
+- `writeConcern: "majority"`  
+  → 계정 정보 및 인증 관련 데이터는 **정합성**이 매우 중요하므로, 다수 노드에 반영된 후 성공 처리하여 **데이터 유실 가능성을 최소화**했습니다.
+
+- `readConcern: "majority"`  
+  → 인증 토큰 검증 등에서 **최신의 확정된 데이터**를 읽기 위해 `majority` 수준으로 설정했습니다.
+
+### 🎁 Event 서버
+
+- `writeConcern: "majority"`  
+  → **보상 지급 기록** 등은 **중복 지급 방지**를 위해 정확한 기록 보장이 필요하므로, 다수 노드 반영 후 성공 처리합니다.
+
+- `readConcern: "local"`  
+  → 이벤트 조회, 조건 확인 등은 약간의 지연이 허용되는 **일반 조회 성격**이므로, **성능을 고려해** `local`로 설정했습니다.
+
+---
+
+## 🧩 추가적으로 보완할 수 있었던 부분
+
+### 📌 이벤트 도메인 구성
+
+- 현재 구조에서도 이벤트 생성 시 조건 및 보상 구성이 가능하지만,  
+  실제 운영 환경을 고려했을 때 다음과 같은 세부 구성이 부족함:
+  - 조건(Condition) 타입별 세부 validation, 예외처리 로직
+  - 보상(Reward)의 유효 기간, 중복 허용 여부, 제한 수량 등 정책적 요소
+  - 관리자용 보상/조건 등록 화면을 통한 운영 효율성 고려
+
+> 시간 관계상 해당 세부 기능을 구현하지 못했지만,  
+> 명확한 분리와 확장 가능한 구조로 설계되어 추후 보완 가능함
+
+### 📌 트랜잭션과 락 제어
+
+- MongoDB는 기본적으로 다큐먼트 단위의 락만 제공하며,  
+  트랜잭션을 사용하더라도 **자원 선점(lock)** 을 통한 선행 제어는 어려움
+- 보상 요청에 대해 중복 처리를 방지하고, 동시성 이슈를 보다 강력히 막기 위해  
+  **Redis 기반의 분산 락**(Redlock 또는 SETNX)을 활용했더라면  
+  더 안정적인 구조가 되었을 것
+
+> 특히 높은 동시성 환경에서 reward grant 처리의 일관성을 보장하려면  
+> 트랜잭션만으로는 부족할 수 있고, 분산락 적용이 바람직함
+
+### 📌 유저 및 역할 도메인 설계
+
+- 기본적인 사용자 정보 CRUD 및 역할(Role) 분리를 구성했지만,
+  - 역할 기반 권한(Authorization)에 대한 정책 정의 미흡
+  - 사용자 상태(활성/휴면/차단 등)나 메타 정보 확장 고려 미흡
+  - 조직 기반 사용자 그룹핑 및 계층적 Role 관리 등 고도화 필요
+
+> 실무에서는 사용자 정보와 권한은 민감한 주제인 만큼,  
+> 좀 더 체계적이고 명확한 도메인 모델 정의가 필요함

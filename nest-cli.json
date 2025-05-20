@@ -5,7 +5,7 @@
   "root": ".",
   "compilerOptions": {
     "webpack": true,
-    "tsConfigPath": "tsconfig.app.json"
+    "tsConfigPath": "tsconfig.json"
   },
   "projects": {
     "gateway": {
@@ -33,6 +33,24 @@
       "sourceRoot": "apps/event/src",
       "compilerOptions": {
         "tsConfigPath": "apps/event/tsconfig.app.json"
+      }
+    },
+    "mock-reward": {
+      "type": "application",
+      "root": "apps/mock-reward",
+      "entryFile": "main",
+      "sourceRoot": "apps/mock-reward/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/mock-reward/tsconfig.app.json"
+      }
+    },
+    "mock-reward-condition": {
+      "type": "application",
+      "root": "apps/mock-reward-condition",
+      "entryFile": "main",
+      "sourceRoot": "apps/mock-reward-condition/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/mock-reward-condition/tsconfig.app.json"
       }
     }
   }
