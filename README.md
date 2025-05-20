@@ -95,8 +95,6 @@ apps
 - 보상 조건을 만족하는지 판단하는 **테스트용 모듈**
 - 사용자 정보 및 이벤트 조건을 기반으로 **조건 일치 여부 판별**
 
----
-
 ## 📦 주요 도메인 설명
 
 ### 1. RewardClaimHistory
@@ -137,8 +135,6 @@ apps
 2. 내부 이벤트 `reward.claim.requested` (보상 지급 요청) 발행
 3. `MockRewardService`가 수신 후, 즉시 `reward.claim.granted` (보상 지금 완료) 발행
 4. event 서버의 `RewardGrantedController`가 수신하여 보상 상태를 업데이트 (`isFullyGranted` 판단)
-
----
 
 ## 실시간 보상 처리 설계 및 중복 방지 전략
 
@@ -203,8 +199,6 @@ apps
 
 - `readConcern: "local"`  
   → 이벤트 조회, 조건 확인 등은 약간의 지연이 허용되는 **일반 조회 성격**이므로, **성능을 고려해** `local`로 설정했습니다.
-
----
 
 ## 🧩 추가적으로 보완할 수 있었던 부분
 
