@@ -131,7 +131,7 @@ apps
 
 이벤트 기반 마이크로서비스 구조로 아래와 같은 흐름으로 동작합니다:
 
-1. `POST /claim` 요청 시 내부 조건 평가 및 이력 생성
+1. 사용자가 직접 `POST event/:eventId/reward-claims` 요청 (이벤트 보상 요청) 시 내부 조건 평가 및 이력 생성
 2. 내부 이벤트 `reward.claim.requested` (보상 지급 요청) 발행
 3. `MockRewardService`가 수신 후, 즉시 `reward.claim.granted` (보상 지금 완료) 발행
 4. event 서버의 `RewardGrantedController`가 수신하여 보상 상태를 업데이트 (`isFullyGranted` 판단)
