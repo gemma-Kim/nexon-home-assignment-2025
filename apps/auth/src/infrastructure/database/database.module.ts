@@ -14,7 +14,7 @@ import { User, UserSchema } from './schemas/user.schema';
         j: true,
         wtimeout: 1000,
       },
-      readConcern: { level: 'local' },
+      readConcern: { level: 'majority' },
     }),
   ],
   exports: [

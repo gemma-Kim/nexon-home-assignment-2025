@@ -30,6 +30,7 @@ export class AuthController {
 
   // 임시 가드 해제
   // @UseGuards(AdminGuard)
+  @Public()
   @Post('signUp/internal')
   @ApiOperation({
     summary: '관리자 사용자 등록',

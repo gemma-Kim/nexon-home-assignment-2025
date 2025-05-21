@@ -20,7 +20,7 @@ import {
         j: true,
         wtimeout: 1000,
       },
-      readConcern: { level: 'majority' },
+      readConcern: { level: 'local' },
     }),
     MongooseModule.forFeature([
       { name: EventModel.name, schema: EventSchema },
