@@ -12,15 +12,16 @@ import {
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://mongo:27017/event?replicaSet=rs0', {
+    // 레플리카 셋 설정 임시 제거
+    MongooseModule.forRoot('mongodb://mongo:27017/event', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      writeConcern: {
-        w: 'majority',
-        j: true,
-        wtimeout: 1000,
-      },
-      readConcern: { level: 'local' },
+      // writeConcern: {
+      //   w: 'majority',
+      //   j: true,
+      //   wtimeout: 1000,
+      // },
+      // readConcern: { level: 'local' },
     }),
     MongooseModule.forFeature([
       { name: EventModel.name, schema: EventSchema },
