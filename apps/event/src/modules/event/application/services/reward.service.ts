@@ -9,8 +9,6 @@ import { EventService } from './event.service';
 import { RewardRepository } from '../../infrastructure/repositories/reward.repository';
 import { RewardClaimHistoryWriteService } from '../../../reward/application/sevices/reward-claim-history-write.service';
 import { RewardClaimResultReason } from 'apps/event/src/infrastructure/database/enums/reward-claim-history.enum';
-import { RewardEntity } from '../../domain/entities/reward.entity';
-import { RewardType } from 'apps/event/src/infrastructure/database/enums/reward.enum';
 import { ConditionEvaluatorService } from './condition-evaluator.service';
 import { EventEntity } from '../../domain/entities/event.entity';
 import { RewardEventPublisher } from '../events/reward-event-publisher.interface';
@@ -128,7 +126,13 @@ export class RewardService {
         })),
       });
     } catch (e) {
-      await session.abortTransaction();
+      try {
+        await session.abortTransaction();
+      } catch (abortErr) {
+        console.error('❗ abortTransaction 실패:', abortErr);
+      }
+
+      console.error('❗ 트랜잭션 내부 오류 발생:', e);
 
       if (e.code === 11000) {
         throw new ConflictException('이미 보상 요청된 이벤트입니다.');
