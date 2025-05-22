@@ -4,10 +4,12 @@ services:
     image: mongo:5.0
     ports:
       - 27018:27017
-    # command: ['--replSet', 'rs0'] #레플리카 셋 설정 임시 제거
+    container_name: mongo
+    hostname: mongo
+    command: ['mongod', '--replSet', 'rs0']
     volumes:
       - ./mongo-data:/data/db
-      # - ./mongo.init.js:/docker-entrypoint-initdb.d/mongo.init.js:ro #
+      - ./mongo.init.js:/docker-entrypoint-initdb.d/mongo.init.js:ro
     networks:
       - app-network
 
